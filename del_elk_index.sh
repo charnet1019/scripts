@@ -118,3 +118,4 @@ del_monitor_index() {
 # ##### main
 del_custome_index "${INDEX[*]}"
 del_monitor_index "${MONITOR_INDEX[*]}"
+
