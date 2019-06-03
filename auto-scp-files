@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ##########################################################
 #
 # Copyright (2017-10-21, )
@@ -15,19 +16,18 @@ declare -A IPListDict
 # 所有主机默认使用root帐号
 USERNAME=root
 # 本地要拷贝的文件
-LOCAL="/etc/hosts"
+LOCAL="/home/main.py"
 # 拷贝到远程主机的位置
-REMOTE="/tmp"
+REMOTE="/opt/"
 
-# 主机IP地址和密码，每行一个主机
+# 格式: 主机IP:端口=密码，每行一个主机，密码为空则为免密连接
 IPListDict=(
-[192.168.2.3:22]="secret"
-[192.168.2.4:22018]="secret"
+[192.168.2.7:22]=""
 )
 
 ssh_key_base_dir=~/.ssh
 ssh_known_hosts=$ssh_key_base_dir/known_hosts
-SCP=/usr/bin/scp
+SCP=`which scp`
 
 DATETIME=`date "+%F %T"`
 
@@ -76,7 +76,7 @@ log() {
 }
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+    command -v "$@" > /dev/null 2>&1
 }
 
 install_expect() {
@@ -117,38 +117,47 @@ exec_cp() {
     for item in ${!IPListDict[@]}; do
         IP=`echo "$item" | cut -d':' -f1`
         PORT=`echo "$item" | cut -d':' -f2`
-	
+    
         get_cipher $IP $PORT
-        expect -c  <<- EOF &> /dev/null "
-            spawn $SCP -P $PORT -r $LOCAL $USERNAME@$IP:$REMOTE
-            expect {
-                \"(yes/no)?\" {
-                    send \"yes\r\"
-                    expect {
-                        "*assword" {
-                            send \"$PASSWORD\r\"
+        if [ X"${PASSWORD}" != X"" ]; then
+            expect -c  <<- EOF &> /dev/null "
+                spawn $SCP -P $PORT -r $LOCAL $USERNAME@$IP:$REMOTE
+                expect {
+                    \"(yes/no)?\" {
+                        send \"yes\r\"
+                        expect {
+                            "*assword" {
+                                send \"$PASSWORD\r\"
+                            }
                         }
                     }
-                }
 
-                "*assword*" {
-                    send \"$PASSWORD\r\"
+                    "*assword*" {
+                        send \"$PASSWORD\r\"
+                    }
+                    expect "100%"
+                    expect eof    
                 }
-                expect "100%"
-                expect eof    
-            }
-            catch wait retVal
-            exit [lindex \$retVal 3]"
+                catch wait retVal
+                exit [lindex \$retVal 3]"
 EOF
-
-        if [ $? -eq 0 ]; then
-            log info "The file $LOCAL copy to the remote host $IP successed."
+            if [ $? -eq 0 ]; then
+                log info "The file $LOCAL copy to the remote host $IP:${REMOTE} successed."
+            else
+                log err "The file $LOCAL copy to the remote host $IP:${REMOTE} failed."
+            fi
         else
-            log err "The file $LOCAL copy to the remote host $IP failed."
-        fi
+            $SCP -P $PORT -r $LOCAL $USERNAME@$IP:$REMOTE
+            if [ $? -eq 0 ]; then
+                log info "The file $LOCAL copy to the remote host $IP:${REMOTE} successed."
+            else
+                log err "The file $LOCAL copy to the remote host $IP:${REMOTE} failed."
+            fi
+        fi    
     done
 }
 
 # ##### main entrypoint
 check_expect
 exec_cp
+
