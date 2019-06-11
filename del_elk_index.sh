@@ -3,7 +3,7 @@
 # Author: pengchanghong
 # Date: 20190313
 
-# 0 0 * * * /bin/bash /usr/local/exueyun/elk/del_index.sh &> /dev/null
+# 0 0 * * * /bin/bash /usr/local/ex/elk/del_index.sh &> /dev/null
 
 ESIP=192.168.129.3
 ESPORT=9200
