@@ -197,4 +197,3 @@ for element in ${!IPListDict[@]}; do
 
     copy_pub_key $IP $PORT
 done
-
