@@ -31,9 +31,7 @@ logstash-api_attendance
 )
 LOGFILE="/var/log/elkDel.log"
 
-if [ ! -f $LOGFILE ]; then
-    touch $LOGFILE
-fi
+[ ! -f $LOGFILE ] && touch $LOGFILE
 
 is_delete(){
     if [ $(($1-$2)) -gt 0 ]; then
