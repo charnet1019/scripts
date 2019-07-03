@@ -65,7 +65,7 @@ del_custome_index() {
                 if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
                     delResult=`curl -s -XDELETE http://$ESIP:$ESPORT/${index}`
                 else
-                    delResult=`curl -s -u elastic:vIvVNK/hJ1I7BOzw -XDELETE http://$ESIP:$ESPORT/${index}`
+                    delResult=`curl -s -u ${USERNAME}:${PASSWD} -XDELETE http://$ESIP:$ESPORT/${index}`
                 fi
 
                 echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
@@ -100,7 +100,7 @@ del_monitor_index() {
                 if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
                     delResult=`curl -s -XDELETE http://$ESIP:$ESPORT/${index}`
                 else
-                    delResult=`curl -s -u elastic:vIvVNK/hJ1I7BOzw -XDELETE http://$ESIP:$ESPORT/${index}`
+                    delResult=`curl -s -u ${USERNAME}:${PASSWD} -XDELETE http://$ESIP:$ESPORT/${index}`
                 fi
 
                 echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
