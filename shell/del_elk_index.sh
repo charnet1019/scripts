@@ -1,6 +1,6 @@
 #/bin/bash
 
-# Author: pengchanghong
+# Author: charnet1019@163.com
 # Date: 20190313
 
 # 0 0 * * * /bin/bash /usr/local/exueyun/elk/del_index.sh &> /dev/null
