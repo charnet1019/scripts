@@ -155,9 +155,7 @@ forcemerge_index_segment () {
             INDEXES=$(curl -s -u ${USERNAME}:${PASSWD} -X GET http://$ESIP:$ESPORT/_cat/indices?v | grep -w "$index" | awk '{print $3}')
         fi
 
-        #LIFECYCLE=$(date -d "$(date "+%Y%m%d") -${MONITOR_MAXLIFE} days" "+%s")
         YESTERDAY_TIMESTAMP=$(date -d $(date -d "-${DAYS} days" "+%Y%m%d") "+%s")
-        echo ${YESTERDAY_TIMESTAMP=$}
 
         for index in ${INDEXES}; do
             indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
@@ -167,10 +165,8 @@ forcemerge_index_segment () {
             is_force_merge ${indexTime} ${YESTERDAY_TIMESTAMP}
             if [ $? -eq 0 ]; then
                 if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
-                    #delResult=`curl -s -X DELETE http://$ESIP:$ESPORT/${index}`
                     MERGE_RESULT=$(curl -s -X POST http://$ESIP:$ESPORT/${index}/_forcemerge?max_num_segments=1)
                 else
-                    #delResult=`curl -s -u ${USERNAME}:${PASSWD} -X DELETE http://$ESIP:$ESPORT/${index}`
                     MERGE_RESULT=$(curl -u ${USERNAME}:${PASSWD} -s -X POST http://$ESIP:$ESPORT/${index}/_forcemerge?max_num_segments=1)
                 fi
 
