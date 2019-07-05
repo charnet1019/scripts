@@ -5,7 +5,7 @@
 
 # 0 0 * * * /bin/bash /usr/local/exueyun/elk/del_index.sh &> /dev/null
 
-set -e
+#set -e
 
 ESIP=192.168.129.3
 ESPORT=9200
