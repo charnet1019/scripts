@@ -45,7 +45,7 @@ done
 CA_DATE=${CA_DATE:-3650}
 CA_KEY=${CA_KEY:-cakey.pem}
 CA_CERT=${CA_CERT:-cacerts.pem}
-CA_DOMAIN=myca
+CA_DOMAIN=my
 
 # ssl相关配置
 SSL_CONFIG=${SSL_CONFIG:-$PWD/openssl.cnf}
