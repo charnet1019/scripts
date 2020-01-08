@@ -40,7 +40,10 @@ def getImagesNames(repo_ip,repo_port):
 
             if tags not in [None]:
                 for tag in tags:
-                    docker_name = str(repo_ip) + ":" + str(repo_port) + "/" + name + ":" + tag
+                    if repo_port == 80 or repo_port == 443:
+                        docker_name = str(repo_ip) + "/" + name + ":" + tag
+                    else:
+                        docker_name = str(repo_ip) + ":" + str(repo_port) + "/" + name + ":" + tag
                     docker_images.append(docker_name)
                     print(docker_name)
     except:
