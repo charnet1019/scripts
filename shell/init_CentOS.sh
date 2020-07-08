@@ -149,7 +149,7 @@ if [ "${CentOS_ver}" == '6' ]; then
   sed -i 's@^ACTIVE_CONSOLES.*@ACTIVE_CONSOLES=/dev/tty[1-2]@' /etc/sysconfig/init
   sed -i 's@^start@#start@' /etc/init/control-alt-delete.conf
   sed -i 's@LANG=.*$@LANG="en_US.UTF-8"@g' /etc/sysconfig/i18n
-elif [ ${CentOS_ver} -ge 7 >/dev/null 2>&1 ]; then 
+elif [ ${CentOS_ver} -ge 7 >/dev/null 2>&1 ]; then
   sed -i 's@LANG=.*$@LANG="en_US.UTF-8"@g' /etc/locale.conf
 fi
 
@@ -157,7 +157,7 @@ fi
 
 
 command_exists() {
-	command -v "$@" > /dev/null 2>&1
+        command -v "$@" > /dev/null 2>&1
 }
 
 yum_install_pkgs() {
@@ -307,7 +307,7 @@ services_optimizer
 #
 #. /etc/profile
 
-while :; do 
+while :; do
     echo
     echo "${CMSG}Please restart the server and see if the services start up fine.${CEND}"
     read -e -p "Do you want to restart OS ? [y/n]: " reboot_flag
@@ -319,7 +319,3 @@ while :; do
 done
 
 [ "${reboot_flag}" == 'y' ] && reboot
-
-
-
-
