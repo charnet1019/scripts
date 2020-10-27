@@ -23,6 +23,9 @@ add_user() {
 add_group ${grp}
 add_user ${usr} ${grp}
 
+sudo yum -y install epel-release
+sudo yum makecache
+
 sudo yum -y install python-pip
 sudo pip install supervisor
 
