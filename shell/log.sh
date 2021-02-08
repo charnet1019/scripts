@@ -3,22 +3,22 @@
 # Date: 2019.01.08
 # Author: charnet1019@163.com
 
-DATETIME=`date "+%F %T"`
+
 LOG_FILE="/var/log/cicd.log"
 
 success() {
-    echo "$DATETIME [ INFO ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$DATETIME [ INFO ]" "$1" >> ${LOG_FILE}
+    echo "$(date "+%F %T") [ INFO ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(date "+%F %T") [ INFO ]" "$1" >> ${LOG_FILE}
 }
 
 warn() {
-    echo "$DATETIME [ WARNING ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$DATETIME [ WARNING ]" "$1" >> ${LOG_FILE}
+    echo "$(date "+%F %T") [ WARNING ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(date "+%F %T") [ WARNING ]" "$1" >> ${LOG_FILE}
 }
 
 fail() {
-    echo "$DATETIME [ ERROR ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$DATETIME [ ERROR ]" "$1" >> ${LOG_FILE}
+    echo "$(date "+%F %T") [ ERROR ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(date "+%F %T") [ ERROR ]" "$1" >> ${LOG_FILE}
 }
 
 usage() {
