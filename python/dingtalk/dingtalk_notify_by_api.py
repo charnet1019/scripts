@@ -279,7 +279,8 @@ def send_ding_message():
         if(json.loads(info.text)['errcode'] == 0):
             return jsonify({'retval': 0, 'msg': 'ok', 'description': '告警消息发送成功'})
         
-        return jsonify({'retval': 1, 'msg': 'error', 'description': '告警消息发送失败'})
+        logging.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 钉钉接口调用失败 ' + json.loads(info.text)['sub_msg'])
+        return jsonify({'retval': json.loads(info.text)['sub_code'], 'msg': json.loads(info.text)['sub_msg'], 'description': '告警消息发送失败'})
     else:
         # print('进入else')
         access_token, daedline_time = get_token(dingtalk_appkey, dingtalk_appsecret)
@@ -311,7 +312,8 @@ def send_ding_message():
         if(json.loads(info.text)['errcode'] == 0):
             return jsonify({'retval': 0, 'msg': 'ok', 'description': '告警消息发送成功'})
         
-        return jsonify({'retval': 1, 'msg': 'error', 'description': '告警消息发送失败'})
+        logging.error(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 钉钉接口调用失败 ' + json.loads(info.text)['sub_msg'])
+        return jsonify({'retval': json.loads(info.text)['sub_code'], 'msg': json.loads(info.text)['sub_msg'], 'description': '告警消息发送失败'})
 
     # return jsonify({'msg': 'ok'})
 
