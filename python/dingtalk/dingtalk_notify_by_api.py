@@ -11,6 +11,7 @@ import json
 import uuid
 import sys
 import re
+import logging
 
 from flask import Flask, request, jsonify
 
@@ -343,6 +344,10 @@ if __name__ == "__main__":
 
     # 告警接收人列表
     notify_users = '20xxxxxxx, 20xxxxxx, 20xxxxxx'
+    
+    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+    DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+    logging.basicConfig(filename='/opt/monitor/dingtalk.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
 
     # print('---------------- 启动app前')
     global access_token, daedline_time
