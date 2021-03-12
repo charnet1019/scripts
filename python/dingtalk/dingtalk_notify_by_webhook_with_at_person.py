@@ -21,7 +21,6 @@ import json
 
 def get_timestamp_sign(secret):
     timestamp = str(round(time.time() * 1000))
-    #secret = "SEC767ff0761242961b5be36e26b7525f0ff7261be4b90b9639ce795b4cdd11c423"
     secret_enc = secret.encode('utf-8')
     string_to_sign = '{}\n{}'.format(timestamp, secret)
     string_to_sign_enc = string_to_sign.encode('utf-8')
