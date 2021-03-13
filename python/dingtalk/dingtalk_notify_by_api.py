@@ -251,7 +251,7 @@ def verify_token(timestamp):
         1 token未过期
     '''
     # 过期时间2小时
-    if timestamp - time.time() < 7200:
+    if time.time() - timestamp < 7200:
         return True
 
     return False
