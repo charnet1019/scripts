@@ -6,7 +6,7 @@ SVC_NAME=$1
 POD_IP=$2
 KUBECONFIG=$3
 
-REMOTE_SRV="10.10.10.64"
+REMOTE_SRV="10.10.10.xxx"
 REMOTE_SRV_PATH="/data/jstack_logs"
 REMOTE_SRV_URL="${REMOTE_SRV}:${REMOTE_SRV_PATH}"
 
@@ -42,7 +42,7 @@ get_jstack_log() {
     rm -f /tmp/"${SVC_NAME}"_"${DATETIME_FORMAT}".txt
 
     echo -e "\n++++++++++++++++++++++ 访问地址 ++++++++++++++++++"
-    echo -e "http://10.10.10.64:9999/jstack_logs/"${SVC_NAME}"_"${DATETIME_FORMAT}".txt\n"
+    echo -e "http://${REMOTE_SRV}:9999/jstack_logs/"${SVC_NAME}"_"${DATETIME_FORMAT}".txt\n"
 }
 
 if [ $# -lt 3 ]; then
