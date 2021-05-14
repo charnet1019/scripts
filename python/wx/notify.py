@@ -21,7 +21,7 @@ DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
 logging.basicConfig(filename='/opt/phoneCall/myphone.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
 
 
-@app.route('/iot-frontend/alert', methods=['POST'])
+@app.route('/frontend/alert', methods=['POST'])
 def iot_frontend_alert():
     wx_robot_url = 'https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key=320ffffffffffffffffff'
     try:
@@ -37,7 +37,7 @@ def iot_frontend_alert():
                 env = i.get('labels')['env']
                 app_type = i.get('labels')['app']
                 instance = i.get('labels')['instance']
-                str_msg = env + '环境' + "物联网" + app_type + ': ' + instance + ' 异常, 请检查相关服务.'
+                str_msg = env + '环境' + "小小项目" + app_type + ': ' + instance + ' 异常, 请检查相关服务.'
                 values = {
                     "msgtype": 'text',
                     "text": {'content': str_msg},
