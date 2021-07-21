@@ -1,4 +1,4 @@
-- mysql备份上传到腾讯cos注意事项
+- mysql备份上传到腾讯cos注意事项，修改start_migrate.sh
 ```
 #!/bin/bash
 export LANG=en_US.utf8
