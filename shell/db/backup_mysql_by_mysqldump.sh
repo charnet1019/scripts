@@ -182,6 +182,8 @@ ${IGNORE_DB}
 ${ORIGIN_DB}
 EOF
 )
+
+    log info "***************************** 开始sql备份 ***********************************"
     for db in ${NEED_BK_DB}; do
         dumpdb ${db} 
         if [ $? -eq 0 ]; then
@@ -199,6 +201,7 @@ EOF
 
     #scpFileDump "${DB}"
     #clean_old_data "${DB}"
+    log info "***************************** 完成sql备份 ***********************************"
 }
 
 
