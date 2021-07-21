@@ -5,16 +5,16 @@ DOCKER_VERSION="20.10.6"
 
 # 检测云平台类型
 cloud_platform_type=""
-if dmidecode | grep -qw "Tencent Cloud"; then
+if sudo dmidecode | grep -qw "Tencent Cloud"; then
     cloud_platform_type="qcloud"
-elif dmidecode | grep -qw "Aliyun"; then
+elif sudo dmidecode | grep -qw "Aliyun"; then
     cloud_platform_type="aliyun"
-elif dmidecode | grep -qw "VMware"; then
+elif sudo dmidecode | grep -qw "VMware"; then
     cloud_platform_type="vmware"
-elif dmidecode | grep -qw "OpenStack"; then
+elif sudo dmidecode | grep -qw "OpenStack"; then
     # 也可能是华为云
     cloud_platform_type="openstack"
-elif dmidecode | grep -qw "Dell"; then
+elif sudo dmidecode | grep -qw "Dell"; then
     # 可以认为是物理服务器
     cloud_platform_type="physical"
 fi
