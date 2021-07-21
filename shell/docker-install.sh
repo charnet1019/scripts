@@ -66,14 +66,14 @@ fi
 
 disable_secure() {
     # disable selinux
-    sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
-    setenforce 0
+    sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+    sudo setenforce 0
     # disable firewalld
-    systemctl stop firewalld.service && systemctl disable firewalld.service && systemctl status firewalld.service
+    sudo systemctl stop firewalld.service && sudo systemctl disable firewalld.service && sudo systemctl status firewalld.service
 }
 
 set_kernel_params() {
-    cat >> /etc/sysctl.d/docker.conf<<- EOF
+    sudo cat >> /etc/sysctl.d/docker.conf<<- EOF
 fs.file-max=1000000
 net.core.somaxconn = 65535
 vm.swappiness=0
@@ -84,8 +84,8 @@ net.bridge.bridge-nf-call-ip6tables=1
 net.ipv4.conf.all.rp_filter=1
 EOF
 
-    modprobe br_netfilter
-    sysctl -p
+    sudo modprobe br_netfilter
+    sudo sysctl -p
 }
 
 # ****************** debian/ubuntu ********************
@@ -155,13 +155,13 @@ install_depens_for_rhel_distro() {
 
 # 设置centos和rhel yum源
 add_docker_repo_for_centos_or_rhel() {
-    wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
+    sudo wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
     sudo sed -i 's+download.docker.com+mirrors.tuna.tsinghua.edu.cn/docker-ce+' /etc/yum.repos.d/docker-ce.repo
 }
 
 # 设置fedora yum源
 add_docker_repo_for_defora() {
-    wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/fedora/docker-ce.repo
+    sudo wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/fedora/docker-ce.repo
     sudo sed -i 's+download.docker.com+mirrors.tuna.tsinghua.edu.cn/docker-ce+' /etc/yum.repos.d/docker-ce.repo
 }
 
