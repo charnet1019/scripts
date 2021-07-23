@@ -322,8 +322,8 @@ def send_ding_message():
         })
     else:
         # print('进入else')
-        access_token, daedline_time = get_token(dingtalk_appkey, dingtalk_appsecret)
         logging.info(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' token过期重新获取 ' + access_token)
+        access_token, daedline_time = get_token(dingtalk_appkey, dingtalk_appsecret)
         send_url = 'https://oapi.dingtalk.com/topapi/message/mass/send?access_token={0}'.format(access_token)
         suuid = uuid.uuid1().hex
         # 请求头部
