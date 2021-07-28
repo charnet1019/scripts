@@ -11,14 +11,17 @@ import uuid
 import sys
 import re
 import logging
+from platform import python_version_tuple
 
 from flask import Flask, request, jsonify
 
 # 互动窗文档说明
 # https://developers.dingtalk.com/document/app/group-messaging-apis-for-interactive-service-windows
 
-app = Flask(__name__)
+PY2 = python_version_tuple()[0] == '2'
+PY3 = python_version_tuple()[0] == '3'
 
+app = Flask(__name__)
 
 class CheckJSON():
     def getkeys(self, data):
