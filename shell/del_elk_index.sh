@@ -1,46 +1,22 @@
-#/bin/bash
+#/usr/bin/env bash
 
-# Author: charnet1019@163.com
+# Author: pengchanghong
 # Date: 20190313
+# 删除不以点开头的索引
 
-# 0 0 * * * /bin/bash /usr/local/exueyun/elk/del_index.sh &> /dev/null
+ESIP=172.18.10.11
+ESPORT=19200
+#保留最近N天的日志
+MAXLIFE=7
 
-#set -e
-
-ESIP=192.168.129.3
-ESPORT=9200
-# 如果es没有用户名则置为空
-USERNAME=elastic
-# 如果es没有密码则置为空
-PASSWD=hJ1I7BOzw
-# 保留最近N天的日志
-MAXLIFE=20
-
-# 保留最近N天的ELK系统监控日志
-MONITOR_MAXLIFE=3
-
-# 强制合并几天前的索引
-DAYS=1
-
-# ELK系统索引
-MONITOR_INDEX=(.monitoring-beats
-.monitoring-es
-.monitoring-kibana
-.monitoring-logstash
-.watcher-history
-)
-
-INDEX=(logstash_agent_web
-logstash_api_agent
-logstash_api_attendance
-logstash_api_auth
-logstash_api_boss
-)
+# 索引格式
+# dev-qxy-2021.04.19
 
 LOGFILE="/var/log/elkDel.log"
 
-[ ! -f $LOGFILE ] && touch $LOGFILE
-
+if [ ! -f $LOGFILE ]; then
+    touch $LOGFILE
+fi
 
 is_delete(){
     if [ $(($1-$2)) -gt 0 ]; then
@@ -50,14 +26,23 @@ is_delete(){
     return 0
 }
 
+is_start_with_dot() {
+    local str="$1"
+
+    if [[ ${str} =~ ^\..* ]]; then
+        return `true`
+    fi
+
+    return `false`
+}
 
 is_force_merge() {
     if [ $(($2-$1)) -ge 0 ]; then
-        return 0
+        return $(true)
     fi
 
-    #return 1
-    continue
+    return $(false)
+    #continue
 }
 
 
@@ -65,81 +50,8 @@ command_exists() {
         command -v "$@" > /dev/null 2>&1
 }
 
-# 删除业务自定义索引
-del_custome_index() {
-    local IDX=$1
-
-    for index in ${IDX[*]}; do
-        if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
-            INDEXES=$(curl -s -X GET http://$ESIP:$ESPORT/_cat/indices?v | grep -w "$index" | awk '{print $3}')
-        else
-            INDEXES=$(curl -s -u ${USERNAME}:${PASSWD} -X GET http://$ESIP:$ESPORT/_cat/indices?v | grep -w "$index" | awk '{print $3}')
-        fi
-
-        LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
-
-        for index in ${INDEXES}; do
-            indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
-            indexTime=`date -d "${indexDate}" "+%s"`
-
-            is_delete ${indexTime} ${LIFECYCLE}
-            if [ $? -eq 0 ]; then
-                if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
-                    delResult=`curl -s -X DELETE http://$ESIP:$ESPORT/${index}`
-                else
-                    delResult=`curl -s -u ${USERNAME}:${PASSWD} -X DELETE http://$ESIP:$ESPORT/${index}`
-                fi
-
-                echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
-                if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
-                    echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
-                else
-                    echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
-                fi
-            fi
-        done
-    done
-}
-
-
-# 删除ELK系统监控索引
-del_monitor_index() {
-    local IDX=$1
-
-    for index in ${IDX[*]}; do
-        if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
-            INDEXES=$(curl -s -X GET http://$ESIP:$ESPORT/_cat/indices?v | grep -w "$index" | awk '{print $3}')
-        else
-            INDEXES=$(curl -s -u ${USERNAME}:${PASSWD} -X GET http://$ESIP:$ESPORT/_cat/indices?v | grep -w "$index" | awk '{print $3}')
-        fi
-
-        LIFECYCLE=$(date -d "$(date "+%Y%m%d") -${MONITOR_MAXLIFE} days" "+%s")
-
-        for index in ${INDEXES}; do
-            indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
-            indexTime=`date -d "${indexDate}" "+%s"`
-
-            is_delete ${indexTime} ${LIFECYCLE}
-            if [ $? -eq 0 ]; then
-                if [[ X"${USERNAME}" = X"" || X"${PASSWD}" = X"" ]]; then
-                    delResult=`curl -s -X DELETE http://$ESIP:$ESPORT/${index}`
-                else
-                    delResult=`curl -s -u ${USERNAME}:${PASSWD} -X DELETE http://$ESIP:$ESPORT/${index}`
-                fi
-
-                echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
-                if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
-                    echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
-                else
-                    echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
-                fi
-            fi
-        done
-    done
-}
-
-
 # 合并索引segment减少heap内存占用
+# TBD
 forcemerge_index_segment () {
     local IDX=$1
 
@@ -184,8 +96,71 @@ forcemerge_index_segment () {
 }
 
 
-# ##### main
-del_custome_index "${INDEX[*]}"
-del_monitor_index "${MONITOR_INDEX[*]}"
-forcemerge_index_segment "${INDEX[*]}"
+del_es_old_index() {
+    local es_host="$1"
+    local es_port="$2"
+    local es_username="$3"
+    local es_password="$4"
+
+    if [ -n "${es_host}" -a -n "${es_port}" -a -z "${es_username:-}" -a -z "${es_password:-}" ]; then
+        LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
+        INDEXES=$(curl -s -XGET http://"${es_host}":"${es_port}"/_cat/indices | awk '{print $3}')
+
+        for index in ${INDEXES}; do
+            is_start_with_dot "${index}"
+            if [ $? -ne 0 ]; then
+                indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
+                indexTime=`date -d "${indexDate}" "+%s"`
+                
+                echo $index
+
+                is_delete ${indexTime} ${LIFECYCLE}
+                if [ $? -eq 0 ]; then
+                    delResult=`curl -s -XDELETE http://"${es_host}":"${es_port}"/${index}`
+                    echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
+
+                    if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
+                        echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
+                    else
+                        echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                    fi
+                fi
+            fi
+        done
+    elif [ -n "${es_host}" -a -n "${es_port}" -a -n "${es_username}" -a -n "${es_password}" ]; then
+        LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
+        INDEXES=$(curl -s -u "${es_username}":"${es_password}" -XGET http://"${es_host}":"${es_port}"/_cat/indices | awk '{print $3}')
+        #INDEXES=$(curl -s -XGET http://$ESIP:$ESPORT/_cat/indices | awk '{print $3}')
+
+        for index in ${INDEXES}; do
+            is_start_with_dot "${index}"
+            if [ $? -ne 0 ]; then
+                indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
+                indexTime=`date -d "${indexDate}" "+%s"`
+                
+                echo $index
+
+                is_delete ${indexTime} ${LIFECYCLE}
+                if [ $? -eq 0 ]; then
+                    delResult=`curl -s -u "${es_username}":"${es_password}" -XDELETE http://"${es_host}":"${es_port}"/${index}`
+                    #delResult=`curl -s -XDELETE http://$ESIP:$ESPORT/${index}`
+                    echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
+
+                    if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
+                        echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
+                    else
+                        echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                    fi
+                fi
+            fi
+        done
+    else
+        echo "`date "+%F %T"` Invalid parameter." >> $LOGFILE
+    fi
+}
+
+
+# ####### entrypoint 
+del_es_old_index "ESIP" "ESPORT"
+
 
