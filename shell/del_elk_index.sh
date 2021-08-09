@@ -161,6 +161,6 @@ del_es_old_index() {
 
 
 # ####### entrypoint 
-del_es_old_index "ESIP" "ESPORT"
+del_es_old_index "${ESIP}" "${ESPORT}"
 
 
