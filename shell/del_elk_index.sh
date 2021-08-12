@@ -1,6 +1,6 @@
 #/usr/bin/env bash
 
-# Author: pengchanghong
+# Author: charnet1019
 # Date: 20190313
 # 删除不以点开头的索引
 
