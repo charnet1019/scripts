@@ -15,7 +15,7 @@ from platform import python_version_tuple
 
 from flask import Flask, request, jsonify
 
-# 互动窗文档说明
+# 互动服务窗文档说明
 # https://developers.dingtalk.com/document/app/group-messaging-apis-for-interactive-service-windows
 
 PY2 = python_version_tuple()[0] == '2'
