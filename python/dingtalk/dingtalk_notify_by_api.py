@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-实现调用钉钉互动窗api接口发送告警信息
+实现调用钉钉互动服务窗api接口发送告警信息
 '''
 
 import time
