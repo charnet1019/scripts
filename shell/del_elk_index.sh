@@ -6,6 +6,9 @@
 
 ESIP=172.18.10.11
 ESPORT=19200
+# 没有用户名和密码则留空
+ES_USERNAME=
+ES_PASSWORD=
 #保留最近N天的日志
 MAXLIFE=7
 
@@ -161,6 +164,6 @@ del_es_old_index() {
 
 
 # ####### entrypoint 
-del_es_old_index "${ESIP}" "${ESPORT}"
+del_es_old_index "${ESIP}" "${ESPORT}" "${ES_USERNAME}" "${ES_PASSWOD}"
 
 
