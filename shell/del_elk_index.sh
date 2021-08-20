@@ -115,7 +115,7 @@ del_es_old_index() {
                 indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
                 indexTime=`date -d "${indexDate}" "+%s"`
                 
-                echo $index
+                #echo $index
 
                 is_delete ${indexTime} ${LIFECYCLE}
                 if [ $? -eq 0 ]; then
