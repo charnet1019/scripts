@@ -17,8 +17,8 @@
 # definition IP dictionary array
 declare -A IPListDict
 
-# 以当前登录用户执行此脚本，且所有主机要存在此用户并设置有密码
-USER_NAME=`whoami`
+USER_NAME="root"
+#USER_NAME=`whoami`
 
 # 主机IP地址和密码，每行一个主机
 IPListDict=(
