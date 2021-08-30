@@ -21,8 +21,8 @@ USER_NAME="root"
 
 # 主机IP地址和密码，每行一个主机
 IPListDict=(
-[192.168.2.3:22]="secret"
-[192.168.2.4:22018]="secret"
+[192.168.60.5:22]="secret"
+[192.168.60.6:22022]="secret"
 )
 
 # for ssh
@@ -134,17 +134,39 @@ generate_ssh_key() {
    if [ ! -f ${ssh_pri_key} ]; then
        ${ssh_keygen} -t ${ssh_key_type} -b ${ssh_key_bit} -P "${ssh_pwd}" -f ${ssh_pri_key} &> /dev/null
        if [ $? -eq 0 ]; then
-           log info "Generated ssh key successfully."
+           log info "Generate ssh key successfully."
        else
-           log err "Generated ssh key failed."
+           log err "Generate ssh key failed."
        fi
    else
-       echo "y" | ${ssh_keygen} -t ${ssh_key_type} -P "${ssh_pwd}" -f ${ssh_pri_key} &> /dev/null
-       if [ $? -eq 0 ]; then
-           log info "Generated ssh key successfully."
-       else
-           log err "Generated ssh key failed."
-       fi
+       echo "+++++ SSH key is already exists. +++++"
+       echo
+       echo "Select an option:"
+       echo "   1) Regenerate a new ssh key"
+       echo "   2) Use an existing ssh key"
+       echo "   3) Exit"
+       read -p "Option: " option
+       until [[ "$option" =~ ^[1-3]$ ]]; do
+                echo "$option: invalid selection."
+                read -p "Option: " option
+       done
+       case "$option" in
+           1)
+               echo "y" | ${ssh_keygen} -t ${ssh_key_type} -b ${ssh_key_bit} -P "${ssh_pwd}" -f ${ssh_pri_key} &> /dev/null
+               if [ $? -eq 0 ]; then
+                   log info "Re-generate ssh key successfully."
+               else
+                   log err "Re-generate ssh key failed."
+               fi
+               ;;
+           2)
+               :
+               log info "Use an existing ssh key."
+               ;;
+           3)
+               exit
+               ;;
+       esac
    fi
 }
 
@@ -198,3 +220,6 @@ for element in ${!IPListDict[@]}; do
 
     copy_pub_key $IP $PORT
 done
+
+
+
