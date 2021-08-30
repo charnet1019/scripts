@@ -132,7 +132,7 @@ del_exist_host() {
 
 generate_ssh_key() {
    if [ ! -f ${ssh_pri_key} ]; then
-       ${ssh_keygen} -t ${ssh_key_type} ${ssh_key_bit} -P "${ssh_pwd}" -f ${ssh_pri_key} &> /dev/null
+       ${ssh_keygen} -t ${ssh_key_type} -b ${ssh_key_bit} -P "${ssh_pwd}" -f ${ssh_pri_key} &> /dev/null
        if [ $? -eq 0 ]; then
            log info "Generated ssh key successfully."
        else
