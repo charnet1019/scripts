@@ -102,10 +102,10 @@ forcemerge_index_segment () {
 del_es_old_index() {
     local es_host="$1"
     local es_port="$2"
-    local es_username="$3"
-    local es_password="$4"
+    local es_username="${3:-}"
+    local es_password="${4:-}"
 
-    if [ -n "${es_host}" -a -n "${es_port}" -a -z "${es_username:-}" -a -z "${es_password:-}" ]; then
+    if [ -n "${es_host}" -a -n "${es_port}" -a -z "${es_username}" -a -z "${es_password}" ]; then
         LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
         INDEXES=$(curl -s -XGET http://"${es_host}":"${es_port}"/_cat/indices | awk '{print $3}')
 
