@@ -14,7 +14,7 @@ elif sudo dmidecode | grep -qw "VMware"; then
 elif sudo dmidecode | grep -qw "OpenStack"; then
     # 也可能是华为云
     cloud_platform_type="openstack"
-elif sudo dmidecode | grep -qw "Dell"; then
+elif sudo dmidecode | grep -iqw "dell"; then
     # 可以认为是物理服务器
     cloud_platform_type="physical"
 fi
