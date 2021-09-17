@@ -255,7 +255,7 @@ def verify_token(timestamp):
     :type timestamp: int
     """
     # 过期时间2小时
-    if timestamp - int(time.time()) < 7200:
+    if timestamp - int(time.time()) <= 7200:
         return True
 
     return False
