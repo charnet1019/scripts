@@ -249,12 +249,13 @@ def get_token(appkey, appsecret):
 
 
 def verify_token(timestamp):
-    '''
-    return: 
-        1 token未过期
-    '''
+    """判断token是否过期
+    
+    :param timestamp: token过期时间戳
+    :type timestamp: int
+    """
     # 过期时间2小时
-    if time.time() - timestamp < 7200:
+    if timestamp - int(time.time()) < 7200:
         return True
 
     return False
