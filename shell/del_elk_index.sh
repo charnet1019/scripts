@@ -14,6 +14,7 @@ MAXLIFE=7
 
 # 索引格式
 # dev-qxy-2021.04.19
+# dev-qxy-20210419
 
 LOGFILE="/var/log/elkDel.log"
 
