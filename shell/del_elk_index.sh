@@ -113,6 +113,7 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
+                # 处理时间格式为: YYYYMMDD或YYYY-MM-DD
                 indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
                 indexTime=`date -d "${indexDate}" "+%s"`
                 
@@ -139,6 +140,7 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
+                # 处理时间格式为: YYYYMMDD或YYYY-MM-DD
                 indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
                 indexTime=`date -d "${indexDate}" "+%s"`
                 
