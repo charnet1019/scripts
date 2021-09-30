@@ -74,6 +74,7 @@ forcemerge_index_segment () {
         YESTERDAY_TIMESTAMP=$(date -d $(date -d "-${DAYS} days" "+%Y%m%d") "+%s")
 
         for index in ${INDEXES}; do
+            # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
             indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
             indexTime=`date -d "${indexDate}" "+%s"`
 
@@ -113,7 +114,7 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
-                # 处理时间格式为: YYYYMMDD或YYYY-MM-DD
+                # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
                 indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
                 indexTime=`date -d "${indexDate}" "+%s"`
                 
@@ -140,7 +141,7 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
-                # 处理时间格式为: YYYYMMDD或YYYY-MM-DD
+                # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
                 indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
                 indexTime=`date -d "${indexDate}" "+%s"`
                 
