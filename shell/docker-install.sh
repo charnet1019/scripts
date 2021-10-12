@@ -277,7 +277,7 @@ elif [[ "${cloud_platform_type}" == "aliyun" && "${os}" == "fedora" ]]; then
     install_docker_for_rhel_distro
     set_docker_registry_for_aliyun
     start_docker
-elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical" && "${os}" == "ubuntu" ]]; then
+elif [[ ("${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical") && "${os}" == "ubuntu" ]]; then
     disable_secure
     set_kernel_params
     remove_old_docker_for_debian_or_ubuntu
@@ -286,7 +286,7 @@ elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "ope
     install_docker_for_debian_or_ubuntu
     set_docker_registry_for_aliyun
     start_docker
-elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical" && "${os}" == "debian" ]]; then
+elif [[ ("${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical") && "${os}" == "debian" ]]; then
     disable_secure
     set_kernel_params
     remove_old_docker_for_debian_or_ubuntu
@@ -295,7 +295,7 @@ elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "ope
     install_docker_for_debian_or_ubuntu
     set_docker_registry_for_aliyun
     start_docker
-elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical" && "${os}" == "centos" ]]; then
+elif [[ ("${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical") && "${os}" == "centos" ]]; then
     disable_secure
     set_kernel_params
     remove_old_docker_for_rhel_distro
@@ -304,7 +304,7 @@ elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "ope
     install_docker_for_rhel_distro
     set_docker_registry_for_aliyun
     start_docker
-elif [[ "${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical" && "${os}" == "fedora" ]]; then
+elif [[ ("${cloud_platform_type}" == "vmware" || "${cloud_platform_type}" == "openstack" || "${cloud_platform_type}" == "physical") && "${os}" == "fedora" ]]; then
     disable_secure
     set_kernel_params
     remove_old_docker_for_rhel_distro
