@@ -37,18 +37,18 @@ ssh_pub_key=$ssh_key_base_dir/id_rsa.pub
 ssh_known_hosts=$ssh_key_base_dir/known_hosts
 ssh_copy_id="/usr/bin/ssh-copy-id"
 
-DATETIME=`date "+%F %T"`
+DATETIME='date "+%F %T"'
 
 success() {
-    printf "\r$DATETIME [ \033[00;32mINFO\033[0m ]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [ \033[00;32mINFO\033[0m ]%s\n" "$1"
 }
 
 warn() {
-    printf "\r$DATETIME [\033[0;33mWARNING\033[0m]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [\033[0;33mWARNING\033[0m]%s\n" "$1"
 }
 
 fail() {
-    printf "\r$DATETIME [ \033[0;31mERROR\033[0m ]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [ \033[0;31mERROR\033[0m ]%s\n" "$1"
 }
 
 usage() {
