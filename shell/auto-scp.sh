@@ -29,18 +29,18 @@ ssh_key_base_dir=~/.ssh
 ssh_known_hosts=$ssh_key_base_dir/known_hosts
 SCP=`which scp`
 
-DATETIME=`date "+%F %T"`
+DATETIME='date "+%F %T"'
 
 success() {
-    printf "\r$DATETIME [ \033[00;32mINFO\033[0m ]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [ \033[00;32mINFO\033[0m ]%s\n" "$1"
 }
 
 warn() {
-    printf "\r$DATETIME [\033[0;33mWARNING\033[0m]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [\033[0;33mWARNING\033[0m]%s\n" "$1"
 }
 
 fail() {
-    printf "\r$DATETIME [ \033[0;31mERROR\033[0m ]%s\n" "$1"
+    printf "\r$(eval $DATETIME) [ \033[0;31mERROR\033[0m ]%s\n" "$1"
 }
 
 usage() {
