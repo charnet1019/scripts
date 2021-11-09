@@ -6,19 +6,21 @@
 
 LOG_FILE="/var/log/cicd.log"
 
+DATETIME='date "+%F %T"'
+
 success() {
-    echo "$(date "+%F %T") [ INFO ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$(date "+%F %T") [ INFO ]" "$1" >> ${LOG_FILE}
+    echo "$(eval $DATETIME) [ INFO ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(eval $DATETIME) [ INFO ]" "$1" >> ${LOG_FILE}
 }
 
 warn() {
-    echo "$(date "+%F %T") [ WARNING ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$(date "+%F %T") [ WARNING ]" "$1" >> ${LOG_FILE}
+    echo "$(eval $DATETIME) [ WARNING ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(eval $DATETIME) [ WARNING ]" "$1" >> ${LOG_FILE}
 }
 
 fail() {
-    echo "$(date "+%F %T") [ ERROR ]" "$1" | tee -a ${LOG_FILE}
-    #echo "$(date "+%F %T") [ ERROR ]" "$1" >> ${LOG_FILE}
+    echo "$(eval $DATETIME) [ ERROR ]" "$1" | tee -a ${LOG_FILE}
+    #echo "$(eval $DATETIME) [ ERROR ]" "$1" >> ${LOG_FILE}
 }
 
 usage() {
