@@ -37,9 +37,9 @@ analyze_bigkey() {
     rdb_file=$1
     bigkey_result=$2
 
-    # ## 10KB
+    # ## 获取大于10KB的key
     #${RCT_CMD} -f mem -b 10240 -s ${rdb_file} -o ${bigkey_result}
-    # ## 1MB
+    # ## 获取大于1MB的key
     ${RCT_CMD} -f mem -b 1048576 -s ${rdb_file} -o ${bigkey_result}
 }
 
