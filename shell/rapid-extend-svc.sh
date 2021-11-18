@@ -16,7 +16,7 @@ orch_gitlab_url="http://${gitlab_user}:${gitlab_pwd}@172.18.10.13:10000/exy/dock
 
 # 生产环境服务编排临时存储路径
 orch_prod="/tmp/dockercompose/prod"
-base_path="/opt/exueyun"
+base_path="/opt/exy"
 
 DATETIME='date "+%F %T"'
 
