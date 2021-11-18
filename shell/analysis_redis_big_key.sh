@@ -16,7 +16,11 @@ DB_PORT="13306"
 DB_USER="mysql"
 DB_PASSWD="xxxxxxxx"
 
+# 解决redis-rdb-cli找不到java
+JAVA_HOME=/usr/local/jdk1.8.0_281
+PATH=$JAVA_HOME/bin:$PATH
 
+export JAVA_HOME PATH
 
 
 get_rdb_file() {
@@ -48,23 +52,25 @@ analyze_bigkey "${RDB_PATH}" "${ANALYZE_RESULT_PATH}"
 #sed -i '1d' ${ANALYZE_RESULT_PATH}
 sed -i '/len_largest_element/d' ${ANALYZE_RESULT_PATH}
 
-a=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $1}'`)
-b=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $2}'`)
-c=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $3}'`)
-d=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $4}'`)
-e=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $5}'`)
-f=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $6}'`)
-j=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $7}'`)
+# 结果文件不为空时解析数据并插入数据库
+if [ -s ${ANALYZE_RESULT_PATH} ]; then
+    a=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $1}'`)
+    b=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $2}'`)
+    c=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $3}'`)
+    d=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $4}'`)
+    e=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $5}'`)
+    f=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $6}'`)
+    j=(`cat ${ANALYZE_RESULT_PATH} | awk -F "," '{print $7}'`)
 
+    # ## 插入数据前先清空表
+    ${DB_CMD} -h ${DB_HOST} -P ${DB_PORT} -u${DB_USER} -p${DB_PASSWD} ${DB} -e "TRUNCATE TABLE ${DB_TABLE};"
 
-# ## 插入数据前先清空表
-${DB_CMD} -h ${DB_HOST} -P ${DB_PORT} -u${DB_USER} -p${DB_PASSWD} ${DB} -e "TRUNCATE TABLE ${DB_TABLE};"
-
-arr_len=(${#a[@]})
-#echo ${arr_len}
-for ((i = 0; i < ${arr_len}; i++)); do
-    ${DB_CMD} -h ${DB_HOST} -P ${DB_PORT} -u${DB_USER} -p${DB_PASSWD} ${DB} -e "INSERT INTO  ${DB_TABLE} (db, key_type, key_name, size_in_bytes, encoding, num_elements, len_largest_element) values ('${a[$i]}','${b[$i]}','${c[$i]}','${d[$i]}','${e[$i]}','${f[$i]}','${j[$i]}');" 
-done
+    arr_len=(${#a[@]})
+    #echo ${arr_len}
+    for ((i = 0; i < ${arr_len}; i++)); do
+        ${DB_CMD} -h ${DB_HOST} -P ${DB_PORT} -u${DB_USER} -p${DB_PASSWD} ${DB} -e "INSERT INTO  ${DB_TABLE} (db, key_type, key_name, size_in_bytes, encoding, num_elements, len_largest_element) values ('${a[$i]}','${b[$i]}','${c[$i]}','${d[$i]}','${e[$i]}','${f[$i]}','${j[$i]}');"
+    done
+fi
 
 
 
