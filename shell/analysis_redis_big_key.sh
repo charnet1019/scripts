@@ -44,7 +44,7 @@ analyze_bigkey() {
 }
 
 
-# #### main
+# ############# main ############
 get_rdb_file "${REDIS_REMOTE_HOST}" "${RDB_REMOTE_PATH}" "${RDB_BASE_DIR}"
 analyze_bigkey "${RDB_PATH}" "${ANALYZE_RESULT_PATH}"
 
