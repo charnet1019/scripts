@@ -172,8 +172,9 @@ def verify_token( timestamp):
 
 # ##################### main
 if __name__ == '__main__':
-    DB_PATH = '/opt/ferry/backend/static/database/session.db'
+    #DB_PATH = '/opt/ferry/backend/static/database/session.db'
     #DB_PATH = 'qywechat/session.db'
+    DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.realpath(__file__))), 'database/session.db')
 
     wechat_corp_id = 'wxxxxxxxxxxxxxxxxx4'
     wechat_agent_id = 999999
