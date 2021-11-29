@@ -1,16 +1,16 @@
 #/usr/bin/env bash
 
-# Author: charnet1019
+# Author: pengchanghong
 # Date: 20190313
 # 删除不以点开头的索引
 
-ESIP=172.18.10.11
+ESIP=10.10.2.15
 ESPORT=19200
 # 没有用户名和密码则留空
 ES_USERNAME=
 ES_PASSWORD=
 #保留最近N天的日志
-MAXLIFE=7
+MAXLIFE=25
 
 # 索引格式
 # dev-qxy-2021.04.19
@@ -38,6 +38,22 @@ is_start_with_dot() {
     fi
 
     return `false`
+}
+
+# 索引格式符合 dev-qxy-2021.04.19 或 dev-qxy-20210419则返回真，否则，返回假
+verify_index_format() {
+    local idx=$1
+
+    # 判断索引中是否包含"-"
+    result=$(echo ${idx} | grep "-")
+    if [[ "${result}" != "" ]]; then
+        idx_date=$(echo ${idx} | awk -F- '{print $NF}' | sed 's/\./-/g')
+        if date -d "${idx_date}" "+%s" &> /dev/null; then
+             return $(true)
+        fi
+    fi
+
+    return $(false)
 }
 
 is_force_merge() {
@@ -74,7 +90,6 @@ forcemerge_index_segment () {
         YESTERDAY_TIMESTAMP=$(date -d $(date -d "-${DAYS} days" "+%Y%m%d") "+%s")
 
         for index in ${INDEXES}; do
-            # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
             indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
             indexTime=`date -d "${indexDate}" "+%s"`
 
@@ -107,6 +122,8 @@ del_es_old_index() {
     local es_username="${3:-}"
     local es_password="${4:-}"
 
+    # es无用户名和密码
+    #if [ -n "${es_host}" -a -n "${es_port}" -a -z "${es_username:-}" -a -z "${es_password:-}" ]; then
     if [ -n "${es_host}" -a -n "${es_port}" -a -z "${es_username}" -a -z "${es_password}" ]; then
         LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
         INDEXES=$(curl -s -XGET http://"${es_host}":"${es_port}"/_cat/indices | awk '{print $3}')
@@ -114,26 +131,29 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
-                # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
-                indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
-                indexTime=`date -d "${indexDate}" "+%s"`
-                
-                #echo $index
+                if verify_index_format "${index}"; then
+                    # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
+                    indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
+                    indexTime=`date -d "${indexDate}" "+%s"`
+                    
+                    #echo $index
 
-                is_delete ${indexTime} ${LIFECYCLE}
-                if [ $? -eq 0 ]; then
-                    delResult=`curl -s -XDELETE http://"${es_host}":"${es_port}"/${index}`
-                    echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
+                    is_delete ${indexTime} ${LIFECYCLE}
+                    if [ $? -eq 0 ]; then
+                        delResult=`curl -s -XDELETE http://"${es_host}":"${es_port}"/${index}`
+                        echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
 
-                    if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
-                        echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
-                    else
-                        echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                        if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
+                            echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
+                        else
+                            echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                        fi
                     fi
                 fi
             fi
         done
     elif [ -n "${es_host}" -a -n "${es_port}" -a -n "${es_username}" -a -n "${es_password}" ]; then
+        # es有用户名和密码
         LIFECYCLE=$(date -d "$(date "+%Y%m%d") -$MAXLIFE days" "+%s")
         INDEXES=$(curl -s -u "${es_username}":"${es_password}" -XGET http://"${es_host}":"${es_port}"/_cat/indices | awk '{print $3}')
         #INDEXES=$(curl -s -XGET http://$ESIP:$ESPORT/_cat/indices | awk '{print $3}')
@@ -141,22 +161,24 @@ del_es_old_index() {
         for index in ${INDEXES}; do
             is_start_with_dot "${index}"
             if [ $? -ne 0 ]; then
-                # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
-                indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
-                indexTime=`date -d "${indexDate}" "+%s"`
-                
-                #echo $index
+                if verify_index_format "${index}"; then
+                    # 处理时间格式为: YYYYMMDD 或 YYYY-MM-DD
+                    indexDate=`echo ${index} | awk -F- '{print $NF}' | sed 's/\./-/g'`
+                    indexTime=`date -d "${indexDate}" "+%s"`
+                    
+                    #echo $index
 
-                is_delete ${indexTime} ${LIFECYCLE}
-                if [ $? -eq 0 ]; then
-                    delResult=`curl -s -u "${es_username}":"${es_password}" -XDELETE http://"${es_host}":"${es_port}"/${index}`
-                    #delResult=`curl -s -XDELETE http://$ESIP:$ESPORT/${index}`
-                    echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
+                    is_delete ${indexTime} ${LIFECYCLE}
+                    if [ $? -eq 0 ]; then
+                        delResult=`curl -s -u "${es_username}":"${es_password}" -XDELETE http://"${es_host}":"${es_port}"/${index}`
+                        #delResult=`curl -s -XDELETE http://$ESIP:$ESPORT/${index}`
+                        echo "`date "+%F %T"` delResult is ${delResult}" >> $LOGFILE
 
-                    if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
-                        echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
-                    else
-                        echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                        if [ `echo ${delResult} | grep 'acknowledged' | wc -l` -eq 1 ]; then
+                            echo "`date "+%F %T"` ${index} had already been deleted!" >> $LOGFILE
+                        else
+                            echo "`date "+%F %T"` there is something wrong happend when deleted ${index}" >> $LOGFILE
+                        fi
                     fi
                 fi
             fi
