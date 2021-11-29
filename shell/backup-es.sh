@@ -23,7 +23,7 @@ INDICES="divide_record bury_point_log sys_regions_new"
 
 
 
-
+LOG_FILE="/var/log/backup.log"
 
 success() {
     echo "$(date "+%F %T") [ INFO ]" "$1" | tee -a ${LOG_FILE}
