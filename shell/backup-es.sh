@@ -2,13 +2,13 @@
 
 # 备份es数据到COS
 
-#elasticdump --input=http://10.10.10.10:19200/error_log --output=$ | gzip > /opt/cron/error_log.gz
+#elasticdump --input=http://10.10.3.13:19200/error_log --output=$ | gzip > /opt/cron/error_log.gz
 
 ESDUMP="/usr/local/node-v16.13.0-linux-x64/bin/elasticdump"
 GZIP="/usr/bin/gzip"
 COS_MIGRATION_TOOL="/opt/cron/cos_migrate_tool_v5-1.4.5/start_migrate.sh"
 
-ES_HOST=10.10.10.10
+ES_HOST=10.10.3.13
 ES_PORT=19200
 BACKUP_DIR="/data/backup"
 
@@ -19,11 +19,12 @@ CompressExtName="tar.gz"
 FILENAME="zqy-prod-es"
 
 
-INDICES="divide_record bury_point_log sys_regions_new"
+INDICES="divide_record bury_point_log student_card sys_regions_new attendance_detail"
 
 
 
 LOG_FILE="/var/log/backup.log"
+
 
 success() {
     echo "$(date "+%F %T") [ INFO ]" "$1" | tee -a ${LOG_FILE}
@@ -98,12 +99,20 @@ compressFile() {
 clean_gz_file() {
     local base_path=$1
 
-    rm -f ${base_path}/*.gz
+    log info "删除.gz压缩包"
+    file_names=$(ls ${base_path})
+    for file in ${file_names}; do
+        suffix=${file#*.}
+        if [[ "${suffix}" == "gz" ]]; then
+            rm -f ${base_path}/${file}
+        fi
+    done
 }
 
 delete_old_data() {
     local base_path=$1
 
+    log info "清空备份目录"
     rm -f ${base_path}/*
 }
 
@@ -117,11 +126,12 @@ backup() {
     local IDX=$3
     local BACK_PATH=$4
 
+    log info "开始备份索引${IDX}"
     ${ESDUMP} --input=http://${HOST}:${PORT}/${IDX} --output=$ | ${GZIP} > ${BACK_PATH}/${IDX}.gz
     if [ $? -eq 0 ]; then
-        log info "${IDX}备份成功"
+        log info "索引${IDX}备份成功"
     else
-        log err "${IDX}备份失败"
+        log err "索引${IDX}备份失败"
         exit 1
     fi
 }
@@ -140,6 +150,5 @@ main() {
 
 # ############################ entrypoint ####################################3
 main
-
 
 
