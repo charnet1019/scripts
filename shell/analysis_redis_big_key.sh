@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# 根据size_in_bytes统计bigkey
+
+
 REDIS_REMOTE_HOST="10.10.5.6"
 RDB_REMOTE_PATH="/opt/redis-4.0.8/dump.rdb"
 RCT_CMD="/opt/monitor/redis-rdb-cli/bin/rct"
