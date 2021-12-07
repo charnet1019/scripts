@@ -21,7 +21,8 @@ FILENAME="zqy-prod-es"
 
 INDICES="divide_record bury_point_log student_card sys_regions_new attendance_detail"
 
-
+PATH=$PATH:/usr/local/node-v16.13.0-linux-x64/bin
+export PATH
 
 LOG_FILE="/var/log/backup.log"
 
@@ -123,17 +124,25 @@ migration_to_qcloud_cos() {
 backup() {
     local HOST=$1
     local PORT=$2
-    local IDX=$3
+    local INDXS=$3
     local BACK_PATH=$4
 
-    log info "开始备份索引${IDX}"
-    ${ESDUMP} --input=http://${HOST}:${PORT}/${IDX} --output=$ | ${GZIP} > ${BACK_PATH}/${IDX}.gz
-    if [ $? -eq 0 ]; then
-        log info "索引${IDX}备份成功"
-    else
-        log err "索引${IDX}备份失败"
-        exit 1
-    fi
+    for IDX in ${INDXS}; do
+        {
+            log info "开始备份索引${IDX}"
+            log info "${ESDUMP} --concurrency=4 --limit=2000 --input=http://${HOST}:${PORT}/${IDX} --output=$ | ${GZIP} > ${BACK_PATH}/${IDX}.gz"
+            ${ESDUMP} --concurrency=4 --limit=2000 --input=http://${HOST}:${PORT}/${IDX} --output=$ | ${GZIP} > ${BACK_PATH}/${IDX}.gz
+            #${ESDUMP} --limit=2000 --input=http://${HOST}:${PORT}/${IDX} --output=$ | ${GZIP} > ${BACK_PATH}/${IDX}.gz
+            if [ $? -eq 0 ]; then
+                log info "索引${IDX}备份成功"
+            else
+                log err "索引${IDX}备份失败"
+                exit 1
+            fi
+        } &
+    done
+
+    wait
 }
 
 main() {
