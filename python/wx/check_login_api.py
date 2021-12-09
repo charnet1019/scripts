@@ -81,7 +81,7 @@ class WeChatAlerter():
         try:
             resp = requests.get(get_token_url)
             resp.raise_for_status()
-        except RequestException as e:
+        except Exception as e:
             print("get access_token failed , stacktrace:%s" % e)
 
         token_json = resp.json()
