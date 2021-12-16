@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+'''
+2021.12.09
+通过exporter方式实现prometheus获取接口请求数据
+'''
 
 import os
 import time
@@ -6,8 +10,12 @@ import random
 import json
 import sqlite3
 import platform
+import logging
 
 import requests
+
+from prometheus_client import start_http_server, Counter, Gauge
+from prometheus_client.exposition import generate_latest
 
 
 PY2 = platform.python_version_tuple()[0] < '3'
@@ -173,6 +181,7 @@ def get_unikey():
 
 
 def check_login(url, phone, password, login_type, s_type, code, unik):
+    # url = 'https://boss.zqycloud.com/gateway/exueyun-client-consumer/clientUser/clientLogin'
     headers = {
         "Content-Type": "application/json", 
         "version": "1.2.1",
@@ -192,30 +201,43 @@ def check_login(url, phone, password, login_type, s_type, code, unik):
     resp = requests.post(url=url, data=json.dumps(payload), headers=headers)
     #print(resp.json().get('errorMsg'))
     if resp.json().get('errorMsg') == '操作成功':
+        #login_number_success.inc()
+        login_success.set(1)
         return True
 
+    #login_number_fail.inc()
+    login_success.set(0)
     return False
 
 
+def statis():
+    login_number_success.inc()
+    login_number_fail.inc()
+    
+
 
 if __name__ == '__main__':
+    LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
+    DATE_FORMAT = "%m/%d/%Y %H:%M:%S %p"
+    logging.basicConfig(filename='api.log', level=logging.DEBUG, format=LOG_FORMAT, datefmt=DATE_FORMAT)
+    
     # 检测登录接口
-    url = 'https://boss.mydomain.com/gateway/client-consumer/clientUser/clientLogin'
+    url = 'https://boss.domain.com/gateway/exueyun-client-consumer/clientUser/clientLogin'
     
     # app登录信息
-    userAccount = '1xxxxxxxxxxx72'
-    password = 'f1fxxxxxxxxxxxxxxxxx430'
+    userAccount = '18xxxxxxxxxxxx2'
+    password = 'f1fbxxxxxxxxxxxx430'
     loginType = '0'
     utype = '1'
     verificationCode = ''
 
     DB_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'session.db')
-    print(DB_PATH)
+    # print(DB_PATH)
 
     # 企业微信
-    wechat_corp_id = 'wxxxxxxxxxxxxxx4'
-    wechat_agent_id = '1xxxxxxx'
-    wechat_app_secret = 'obxxxxxxxxxxxxxxxxCslc'
+    wechat_corp_id = 'wwxxxxxxxxxxxx14'
+    wechat_agent_id = '1xxxxxxxxxx6'
+    wechat_app_secret = 'obxxxxxxxxxxxxxxxp5LWCslc'
     tag_id = '5'
     #wechat_user_ids = 'ZhangSan|LiSi'
     wechat_user_ids = ''
@@ -225,31 +247,42 @@ if __name__ == '__main__':
         "content": "App登录接口异常，请及时处理."
     }
     
-    ukey = get_unikey()
-    #print(ukey)
-    if not check_login(url, userAccount, password, loginType, utype, verificationCode, ukey):
-        wechat = WeChatAlerter(wechat_corp_id, wechat_app_secret, wechat_agent_id, wechat_user_ids, tag_id)
+    #login_number_success = Counter('login_number_success', 'Number of successful logins')
+    #login_number_fail = Counter('login_number_fail', 'Number of failed logins')
+
+    login_success = Gauge('login_success', 'Displays whether or not the probe was a success')
+    
+    start_http_server(addr='0.0.0.0', port=8848)
+    while True:
+        # 每5分钟请求一次APP登录接口
+        time.sleep(300)
         
-        db = MySqlite3(DB_PATH)
-        db_result = db.fetch_one()
-        if not list(db_result):
-            access_token, timestamp = wechat.get_token()
-            db.insert_one(access_token, timestamp)
-            wechat.send_msg(msg, msgType)
-        else:
+        ukey = get_unikey()
+        #print(ukey)
+        if not check_login(url, userAccount, password, loginType, utype, verificationCode, ukey):
+            wechat = WeChatAlerter(wechat_corp_id, wechat_app_secret, wechat_agent_id, wechat_user_ids, tag_id)
+            
+            db = MySqlite3(DB_PATH)
             db_result = db.fetch_one()
-            for row in db_result:
-                access_token = row[0]
-                timestamp = row[1]
-            if verify_token(timestamp):
-                # wechat.set_access_token(access_token)
-                wechat.send_msg(msg, msgType, access_token)
-            else:
+            if not list(db_result):
                 access_token, timestamp = wechat.get_token()
-                db.update_one(access_token, timestamp)
-                wechat.send_msg(msg, msgType, access_token)
-        
-        db.close()
+                db.insert_one(access_token, timestamp)
+                wechat.send_msg(msg, msgType)
+            else:
+                db_result = db.fetch_one()
+                for row in db_result:
+                    access_token = row[0]
+                    timestamp = row[1]
+                if verify_token(timestamp):
+                    # wechat.set_access_token(access_token)
+                    wechat.send_msg(msg, msgType, access_token)
+                else:
+                    access_token, timestamp = wechat.get_token()
+                    db.update_one(access_token, timestamp)
+                    wechat.send_msg(msg, msgType, access_token)
+            
+            db.close()
+
 
 
 
