@@ -86,6 +86,8 @@ len() {
 #       add-locks: 在INSERT数据之前和之后锁定和解锁具体的数据表
 #       extended-insert: 表示可以多选插入
 #       lock-tables
+# 使用GTID时备份需要增加  --set-gtid-purged=OFF
+
 dumpdb() {
     local db_name=$1
 
