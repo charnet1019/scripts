@@ -244,7 +244,7 @@ if __name__ == '__main__':
 
     msgType = 'markdown'
     msg = {
-        "content": "App登录接口异常，请及时处理."
+        "content": "{0} App登录接口异常，请及时处理.".format(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     }
     
     #login_number_success = Counter('login_number_success', 'Number of successful logins')
