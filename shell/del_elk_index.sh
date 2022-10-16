@@ -190,6 +190,6 @@ del_es_old_index() {
 
 
 # ####### entrypoint 
-del_es_old_index "${ESIP}" "${ESPORT}" "${ES_USERNAME}" "${ES_PASSWOD}"
+del_es_old_index "${ESIP}" "${ESPORT}" "${ES_USERNAME}" "${ES_PASSWORD}"
 
 
