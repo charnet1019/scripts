@@ -189,6 +189,25 @@ del_es_old_index() {
 }
 
 
+function closeIndex()
+{
+        index_name=$1
+        savedays=$2
+        while [ $savedays -le $3 ]
+        do
+
+                format_day='%Y.%m.%d'
+                sevendayago=`date -d "-${savedays} day " +${format_day}`
+                index=$index_name$sevendayago
+                #echo $sevendayago
+                echo $index
+                curl -XPOST "http://127.0.0.1:9200/${index_name}/_close?pretty"
+                #exit 0
+                savedays=`expr $savedays + 1`
+        done
+}
+
+
 # ####### entrypoint 
 del_es_old_index "${ESIP}" "${ESPORT}" "${ES_USERNAME}" "${ES_PASSWORD}"
 
