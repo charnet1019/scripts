@@ -14,6 +14,8 @@ MYSQLDMUP_CMD="/usr/bin/mysqldump"
 
 declare -A IPListDict
 
+# 默认全部使用root用户
+MYSQL_USER="root"
 # 备份数据库主机IP地址和密码，每行一个主机
 IPListDict=(
 [192.168.0.211:3306]='Wimj@$1209'
