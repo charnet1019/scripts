@@ -75,7 +75,10 @@ EOF
 set_grub() {
     sudo grub2-set-default 0
     sudo cp /boot/grub2/grub.cfg /boot/grub2/grub.cfg.bak
+    # 非efi模式
     sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+    # efi模式
+    #sudo grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
 }
 
 riboot() {
