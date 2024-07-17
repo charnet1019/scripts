@@ -101,6 +101,12 @@ dumpdb() {
         --events \
         --triggers \
         --databases ${db_name} > ${db_name}.sql
+
+    if [ $? -eq 0 ]; then
+            log info "实例${MYSQL_HOST}中的库${db}备份成功"
+    else
+            log err "实例${MYSQL_HOST}中的库${db}备份失败"
+    fi
 }
 
 # 获取所有数据库
@@ -188,11 +194,11 @@ EOF
     log info "***************************** 开始sql备份 ***********************************"
     for db in ${NEED_BK_DB}; do
         dumpdb ${db} 
-        if [ $? -eq 0 ]; then
-            log info "${db}备份成功"
-        else
-            log err "${db}备份失败"
-        fi
+        #if [ $? -eq 0 ]; then
+        #    log info "${db}备份成功"
+        #else
+        #    log err "${db}备份失败"
+        #fi
         compressFile "${db}"
     done
 
