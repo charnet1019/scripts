@@ -4,7 +4,7 @@
 HARBOR_USER="admin"
 HARBOR_PASSWORD="nt5xxxxxxxxxxxxx/vBb"
 HARBOR_URL="https://harbor.xxxn.cn"  # 支持 http:// 或 https://
-PROJECT="huadian"
+PROJECT="hxxxxn"
 
 # 自动识别协议并提取域名
 if [[ "$HARBOR_URL" == http://* ]]; then
